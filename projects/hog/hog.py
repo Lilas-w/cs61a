@@ -21,17 +21,25 @@ def roll_dice(num_rolls, dice=six_sided):
     assert type(num_rolls) == int, 'num_rolls must be an integer.'
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
+
     "*** YOUR CODE HERE ***"
     res = 0
+    # If you call dice fewer or more than num_rolls times, it won't be at the right spot in the cycle for the next roll
+    flag = False
     while num_rolls > 0:
         ran = dice()
         if ran == 1:
-            return 1
-        res += ran
+            flag = True
+        else:
+            res += ran
         num_rolls -= 1
-    return res
-
+    # a return statement within a loop ends the loop
+    if flag:
+        return 1
+    else:
+        return res
     # END PROBLEM 1
+
 
 def piggy_points(score):
     """Return the points scored from rolling 0 dice.
@@ -40,6 +48,14 @@ def piggy_points(score):
     """
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    digit = score ** 2
+    m = digit
+    while digit > 0:
+        res = int(digit % 10)
+        digit = (digit - res) / 10
+        if res < m:
+            m = res
+    return m + 3
     # END PROBLEM 2
 
 
@@ -60,6 +76,11 @@ def take_turn(num_rolls, opponent_score, dice=six_sided, goal=GOAL_SCORE):
     assert opponent_score < goal, 'The game should be over.'
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+
+    if num_rolls == 0:
+        return piggy_points(opponent_score)
+    else:
+        return roll_dice(num_rolls, dice)
     # END PROBLEM 3
 
 
@@ -82,6 +103,19 @@ def more_boar(player_score, opponent_score):
     """
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    a = [int(x) for x in str(player_score)]
+    b = [int(x) for x in str(opponent_score)]
+    while len(a) > len(b):
+        b.insert(0, 0)
+    while len(a) < len(b):
+        a.insert(0, 0)
+    if a[0] < b[0]:
+        # compare two digits
+        if len(a) == 1:
+            return False
+        elif a[1] < b[1]:
+            return True
+    return False
     # END PROBLEM 4
 
 
@@ -121,10 +155,30 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    while True:
+        if who == 0:
+            score0 += take_turn(strategy0(score0, score1), score1,
+                                dice=dice, goal=goal)
+            say = say(score0, score1)
+            if score0 >= goal:
+                break
+            boar = more_boar(score0, score1)
+
+        else:
+            score1 += take_turn(strategy1(score1, score0), score0,
+                                dice=dice, goal=goal)
+            say = say(score0, score1)
+            if score1 >= goal:
+                break
+
+            boar = more_boar(score1, score0)
+        if boar == False:
+            who = next_player(who)
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
     # BEGIN PROBLEM 6
     "*** YOUR CODE HERE ***"
+
     # END PROBLEM 6
     return score0, score1
 
@@ -209,6 +263,21 @@ def announce_highest(who, last_score=0, running_high=0):
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    def say(score0, score1):
+        interest_score = 0
+        if who == 0:
+            interest_score = score0
+        else:
+            interest_score = score1
+
+        m = interest_score - last_score if interest_score - \
+            last_score > running_high else running_high
+        if m != running_high:
+            print(
+                f"Player {who} has reached a new maximum point gain. {m} point(s)!")
+        return announce_highest(who, interest_score, m)
+
+    return say
     # END PROBLEM 7
 
 

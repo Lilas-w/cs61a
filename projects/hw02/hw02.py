@@ -1,12 +1,16 @@
 from operator import add, mul, sub
 
-square = lambda x: x * x
 
-identity = lambda x: x
+def square(x): return x * x
 
-triple = lambda x: 3 * x
 
-increment = lambda x: x + 1
+def identity(x): return x
+
+
+def triple(x): return 3 * x
+
+
+def increment(x): return x + 1
 
 
 HW_SOURCE_FILE = __file__
@@ -31,6 +35,10 @@ def product(n, term):
     162
     """
     "*** YOUR CODE HERE ***"
+    res = 1
+    for x in range(1, n + 1):
+        res *= term(x)
+    return res
 
 
 def square(x):
@@ -60,6 +68,10 @@ def accumulate(combiner, base, n, term):
     16
     """
     "*** YOUR CODE HERE ***"
+    res = base
+    for x in range(1, n + 1):
+        res = combiner(res, term(x))
+    return res
 
 
 def summation_using_accumulate(n, term):
@@ -77,6 +89,7 @@ def summation_using_accumulate(n, term):
     True
     """
     "*** YOUR CODE HERE ***"
+    return accumulate(add, 0, n, term)
 
 
 def product_using_accumulate(n, term):
@@ -93,6 +106,7 @@ def product_using_accumulate(n, term):
     True
     """
     "*** YOUR CODE HERE ***"
+    return accumulate(mul, 1, n, term)
 
 
 def compose1(func1, func2):
@@ -118,6 +132,13 @@ def make_repeater(func, n):
     5
     """
     "*** YOUR CODE HERE ***"
+    def fun(x):
+        times = n
+        while times > 0:
+            x = func(x)
+            times -= 1
+        return x
+    return fun
 
 
 def zero(f):

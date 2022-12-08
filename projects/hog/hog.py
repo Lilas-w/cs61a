@@ -105,17 +105,11 @@ def more_boar(player_score, opponent_score):
     "*** YOUR CODE HERE ***"
     a = [int(x) for x in str(player_score)]
     b = [int(x) for x in str(opponent_score)]
-    while len(a) > len(b):
-        b.insert(0, 0)
-    while len(a) < len(b):
+    if len(a) == 1:
         a.insert(0, 0)
-    if a[0] < b[0]:
-        # compare two digits
-        if len(a) == 1:
-            return False
-        elif a[1] < b[1]:
-            return True
-    return False
+    if len(b) == 1:
+        b.insert(0, 0)
+    return a[0] < b[0] and a[1] < b[1]
     # END PROBLEM 4
 
 
@@ -318,6 +312,14 @@ def make_averaged(original_function, trials_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def fun(*args):
+        times = trials_count
+        res = 0
+        while times > 0:
+            res += original_function(*args)
+            times -= 1
+        return res / trials_count
+    return fun
     # END PROBLEM 8
 
 
@@ -332,6 +334,15 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    times = 0
+    max_score = 0
+    res = make_averaged(roll_dice, trials_count)
+    for x in range(1, 11):
+        score = res(x, dice)
+        if max_score < score:
+            max_score = score
+            times = x
+    return times
     # END PROBLEM 9
 
 
@@ -372,7 +383,12 @@ def piggypoints_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Replace this statement
+    # return 6  # Replace this statement
+    res = piggy_points(opponent_score)
+    if res >= cutoff:
+        return 0
+    else:
+        return num_rolls
     # END PROBLEM 10
 
 
@@ -382,7 +398,12 @@ def more_boar_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Replace this statement
+    # return 6  # Replace this statement
+    res = piggy_points(opponent_score)
+    if res >= cutoff or more_boar(score + res, opponent_score):
+        return 0
+    else:
+        return num_rolls
     # END PROBLEM 11
 
 
